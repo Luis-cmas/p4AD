@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta</title>
+</head>
+<body>
+    <h1>Consulta</h1>
+    <!-- <label for="ciudad">Ciudad:</label> -->
+    <label for="ciudadInput">Ciudad:</label>
+    <input type="text" id="ciudadInput" placeholder="Escribe el nombre de la ciudad">
+    <button onclick="obtenerDatos()">Consultar</button>
+    <div id="resultado"></div>
+    <div id="resultado2"></div>
+    
+
+    <script>
+        function obtenerDatos() {
+            const apiKey = "slylac"; // Reemplaza con tu API Key de OpenWeatherMap
+            const apiKey2 = "2cd2efb8e93c76517b18061aa7e3fdab"; // Reemplaza con tu API Key de OpenWeatherMap
+            
+            const ciudad = document.getElementById("ciudadInput").value;
+            const url2 = `http://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiKey2}`;
+            const url = `http://api.geonames.org/searchJSON?name=${ciudad}&maxRows=1&username=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // if (data.main && data.weather) {
+                        if (data.geonames && data.geonames.length > 0) {    
+                        const Pais = data["geonames"][0].countryName;
+                        const  Poblacion = data["geonames"][0].population;
+                        const resultado = `Pais: ${Pais}<br>Poblacion: ${Poblacion}`;
+                        document.getElementById("resultado").innerHTML = resultado;
+                        console.log('entro'+data);
+                        //aui empieza el menjurge
+                        fetch(url2)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.main && data.weather) {
+                                    const temperatura = (data.main.temp - 273.15).toFixed(2) + "°C";
+                                    const condicionesClimaticas = data.weather[0].description;
+                                    const resultado = `Temperatura: ${temperatura}<br>Condiciones Climáticas: ${condicionesClimaticas}`;
+                                    document.getElementById("resultado2").innerHTML = resultado;
+                                    console.log('entro'+data.main);
+                                } else {
+                                    document.getElementById("resultado").innerHTML = "Datos meteorológicos no disponibles.";
+                                    console.log('no entro'+data.main);
+                                }
+                            })
+                            .catch(error => {
+                                document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                            });
+                        //aqui acaba el menjurge xd
+                    } else {
+                        document.getElementById("resultado").innerHTML = "Datos no disponibles.";
+                        console.log('no entro'+data);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                });
+        }
+    </script>
+</body>
+</html>
